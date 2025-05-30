@@ -14,7 +14,7 @@ const appRouter = router({
     signup: publicProcedure.input(z.object({
         name: z.string(), password: z.string()
     })).mutation((opts) => {
-        console.log(opts)
+        console.log(opts.ctx)
         return {
             msg: opts.input
         }
@@ -25,7 +25,17 @@ export type AppRouter = typeof appRouter;
 
 
 const server = createHTTPServer({
-    router: appRouter
+    router: appRouter,
+    //@ts-ignore
+    createContext: function (opts: any){
+        const authorization = opts.req.headers["authorization"]
+        if(authorization){
+            //do all checkts (jwt verify) etc..
+            return {
+                isAuth  : true
+            }
+        }
+    }
 })
 
 
